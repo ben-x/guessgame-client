@@ -59,14 +59,16 @@ export const getAllChats = ({ commit }) => new Promise((resolve, reject) => {
 
 export const initSocket = ({ commit, dispatch, state }) => new Promise((resolve, reject) => {
   api.getSocket().then((socket) => {
-    socket.on('new-message-logged', () => {
-      dispatch('getAllMessages');
+    socket.on('player-connected', () => {
+      dispatch('getAllPlayers');
+    });
+    socket.on('new-message-logged', ({ chat }) => {
+      if (state.chats.find(i => i._id === chat)) {
+        dispatch('getAllMessages');
+      }
     });
     socket.on('save-message-error', (data) => {
       console.log('save-message-error', data);
-    });
-    socket.on('player-connected', () => {
-      dispatch('getAllPlayers');
     });
     socket.on('game-started', ({ chat }) => {
       // only load games if the chat is associated with the current user
@@ -82,6 +84,11 @@ export const initSocket = ({ commit, dispatch, state }) => new Promise((resolve,
     });
     socket.on('question-answered', ({ chat }) => {
       // only load games if the chat is associated with the current user
+      if (state.chats.find(i => i._id === chat)) {
+        dispatch('getAllGames', { page: 1, limit: 50 });
+      }
+    });
+    socket.on('new-game-started', ({ chat }) => {
       if (state.chats.find(i => i._id === chat)) {
         dispatch('getAllGames', { page: 1, limit: 50 });
       }

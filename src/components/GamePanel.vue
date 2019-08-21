@@ -105,7 +105,7 @@ function messageHandler() {
         break;
       }
       this.send({
-        text: `${process.env.VUE_APP_BOT_NAME} is started a new game... ):`,
+        text: `${process.env.VUE_APP_BOT_NAME} is started a new game... ): `,
         chat: this.currentChatId,
         sentAt: Date.now(),
         meta: { bot: true },

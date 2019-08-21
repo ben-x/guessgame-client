@@ -65,7 +65,7 @@ export default {
     state.games = games;
   },
   updateAllGames(state, games) {
-    state.games = games;
+    state.games = [].concat(games);
   },
   resetState(state) {
     state.isLoggedIn = false;
