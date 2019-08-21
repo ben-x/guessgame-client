@@ -1,7 +1,7 @@
 <template>
   <div class="card shadow-lg bg-white rounded">
     <div class="card-header msg_head">
-      <div class="d-flex bd-highlight">
+      <div class="d-flex bd-highlight" v-if="currentChatId">
         <div class="img_cont">
           <img :src="otherPlayerAvatarUrl" class="rounded-circle user_img">
           <span class="online_icon"></span>
@@ -18,10 +18,12 @@
       <span id="action_menu_btn"><i class="fas fa-ellipsis-v"></i></span>
       <div class="action_menu">
         <ul>
-          <li><i class="fas fa-user-circle"></i> View profile</li>
+          <li><i class="fas fa-user-circle"></i> View profile </li>
+          <!--
           <li><i class="fas fa-users"></i> Add to close friends</li>
           <li><i class="fas fa-plus"></i> Add to group</li>
           <li><i class="fas fa-ban"></i> Block</li>
+          -->
         </ul>
       </div>
     </div>
@@ -80,6 +82,212 @@ import ActionTypes from '../store/action-types';
 
 function getTextFromCmd(text) {
   return text.split(' ').slice(1).join(' ');
+}
+
+function messageHandler() {
+  const text = this.text.trim();
+  if (!text || text.length === 0) return;
+  let gameId = null;
+  if (this.game) {
+    gameId = this.game._id.toString();
+  }
+
+  const split = text.split(' ');
+  switch (split[0]) {
+    case '/game':
+      if (split.length < 2) {
+        this.messages.push({
+          text: 'Start a game with the command /game e.g /game Lion',
+          sentAt: Date.now(),
+          chat: this.currentChatId,
+          meta: { bot: true },
+        });
+        break;
+      }
+      this.send({
+        text: `${process.env.VUE_APP_BOT_NAME} is started a new game... ):`,
+        chat: this.currentChatId,
+        sentAt: Date.now(),
+        meta: { bot: true },
+      });
+      this.startGame({
+        player2: this.otherPlayer._id,
+        word: getTextFromCmd(text),
+        chat: this.currentChatId,
+      });
+      break;
+    case '/guess':
+      if (!this.game) {
+        this.messages.push({
+          text: 'No active game right now... Start a new game by typing \'/game word\'',
+          sentAt: Date.now(),
+          chat: this.currentChatId,
+          meta: { bot: true },
+        });
+        break;
+      }
+      if (this.isPlayer1) {
+        this.messages.push({
+          text: 'Sorry, you cannot guess the answer to a game you started... ):',
+          sentAt: Date.now(),
+          chat: this.currentChatId,
+          meta: { bot: true },
+        });
+        break;
+      }
+      if (split.length < 2) {
+        this.messages.push({
+          text: 'Start a game with the command /guess word e.g /guess Lion',
+          sentAt: Date.now(),
+          chat: this.currentChatId,
+          meta: { bot: true },
+        });
+        break;
+      }
+      // save value because update after mutation affects status
+      this.guessWord({
+        word: getTextFromCmd(text),
+        gameId,
+      }).then((game) => {
+        const msg = {
+          sentAt: Date.now(),
+          chat: this.currentChatId,
+          meta: {
+            bot: true,
+            game: gameId,
+          },
+        };
+        if (game.winner === this.loggedInPlayer._id) {
+          msg.text = `${this.loggedInPlayer.username} wins!`;
+        } else {
+          msg.text = `${this.otherPlayer.username} wins! Actual word is ${game.actual_word}`;
+        }
+        this.send(msg);
+      });
+      break;
+    case '/question':
+      if (!this.game) {
+        this.messages.push({
+          text: 'No active game right now... Start a new game by typing \'/game word\'',
+          sentAt: Date.now(),
+          chat: this.currentChatId,
+          meta: { bot: true },
+        });
+        break;
+      }
+      if (this.isPlayer1) {
+        this.messages.push({
+          text: 'Sorry, you cannot ask question on a game you started... ):',
+          sentAt: Date.now(),
+          avatar: './img/bot2.jpg',
+          bot: true,
+        });
+        break;
+      }
+      if (split.length < 2) {
+        this.messages.push({
+          text: 'Ask a question with the command /question e.g /question Are you married?',
+          sentAt: Date.now(),
+          chat: this.currentChatId,
+          meta: { bot: true },
+        });
+        break;
+      }
+      if (this.questionsLeft === 0) {
+        this.messages.push({
+          text: 'Sorry, maximum number of question exceeded!):',
+          sentAt: Date.now(),
+          avatar: './img/bot2.jpg',
+          bot: true,
+        });
+        break;
+      }
+      if (this.hasUnansweredQuestion) {
+        this.messages.push({
+          text: 'Sorry, you can only ask one question at a time... ):',
+          sentAt: Date.now(),
+          avatar: './img/bot2.jpg',
+          bot: true,
+        });
+        break;
+      }
+      this.send({
+        sender: this.loggedInPlayer._id,
+        chat: this.currentChatId,
+        text: `@question: ${getTextFromCmd(text)}`,
+        sentAt: Date.now(),
+        meta: {
+          question: true,
+          gameId,
+        },
+      });
+      break;
+    case '/answer':
+      if (!this.game) {
+        this.messages.push({
+          text: 'No active game right now... Start a new game by typing \'/game word\'',
+          sentAt: Date.now(),
+          chat: this.currentChatId,
+          meta: { bot: true },
+        });
+        break;
+      }
+      if (!this.isPlayer1) {
+        this.messages.push({
+          text: 'You cannot answer a question on a game you did not start... ):',
+          sentAt: Date.now(),
+          avatar: './img/bot2.jpg',
+          bot: true,
+        });
+        break;
+      }
+      if (!this.hasUnansweredQuestion) {
+        this.messages.push({
+          text: 'No pending question for you to answer',
+          sentAt: Date.now(),
+          avatar: './img/bot2.jpg',
+          bot: true,
+        });
+        break;
+      }
+      if (split.length < 2) {
+        this.messages.push({
+          text: 'Answer a question with the command /answer e.g /answer Yes',
+          sentAt: Date.now(),
+          chat: this.currentChatId,
+          meta: { bot: true },
+        });
+        break;
+      }
+      this.send({
+        sender: this.loggedInPlayer._id,
+        chat: this.currentChatId,
+        text: `@answer: ${getTextFromCmd(text)}`,
+        sentAt: Date.now(),
+        meta: {
+          answer: true,
+          gameId,
+          questionId: this.game.questions[this.game.questions.length - 1].question,
+        },
+      });
+      break;
+    case '/help':
+      this.messages.push({
+        text: 'type /game to start a new game\n, /guess to guess the word during a game, /help for this help',
+        sentAt: Date.now(),
+        avatar: './img/bot2.jpg',
+        bot: true,
+      });
+      break;
+    default:
+      this.send({
+        sender: this.loggedInPlayer._id,
+        chat: this.currentChatId,
+        text: text.toString(),
+        sentAt: Date.now(),
+      });
+  }
+  this.text = '';
 }
 
 export default {
@@ -143,173 +351,7 @@ export default {
       ActionTypes.guessWord,
     ]),
     handleMessage() {
-      const text = this.text.trim();
-      if (!text || text.length === 0) return;
-      let gameId = null;
-      if (this.game) {
-        gameId = this.game._id.toString();
-      }
-
-      const split = text.split(' ');
-      switch (split[0]) {
-        case '/game':
-          this.send({
-            text: `${process.env.VUE_APP_BOT_NAME} is starting a new game... ):`,
-            chat: this.currentChatId,
-            sentAt: Date.now(),
-            meta: { bot: true },
-          });
-          this.startGame({
-            player2: this.otherPlayer._id,
-            word: getTextFromCmd(text),
-            chat: this.currentChatId,
-          });
-          break;
-        case '/guess':
-          if (!this.game) {
-            this.messages.push({
-              text: 'No active game right now... Start a new game by typing \'/game word\'',
-              sentAt: Date.now(),
-              chat: this.currentChatId,
-              meta: { bot: true },
-            });
-            break;
-          }
-          if (this.isPlayer1) {
-            this.messages.push({
-              text: 'Sorry, you cannot guess the answer to a game you started... ):',
-              sentAt: Date.now(),
-              chat: this.currentChatId,
-              meta: { bot: true },
-            });
-            break;
-          }
-          // save value because update after mutation affects status
-          this.guessWord({
-            word: getTextFromCmd(text),
-            gameId,
-          }).then((game) => {
-            const msg = {
-              sentAt: Date.now(),
-              chat: this.currentChatId,
-              meta: {
-                bot: true,
-                game: gameId,
-              },
-            };
-            if (game.winner === this.loggedInPlayer._id) {
-              msg.text = `${this.loggedInPlayer.username} wins!`;
-            } else {
-              msg.text = `${this.otherPlayer.username} wins! Actual word is ${game.actual_word}`;
-            }
-            this.send(msg);
-          });
-          break;
-        case '/question':
-          if (!this.game) {
-            this.messages.push({
-              text: 'No active game right now... Start a new game by typing \'/game word\'',
-              sentAt: Date.now(),
-              chat: this.currentChatId,
-              meta: { bot: true },
-            });
-            break;
-          }
-          if (this.isPlayer1) {
-            this.messages.push({
-              text: 'Sorry, you cannot ask question on a game you started... ):',
-              sentAt: Date.now(),
-              avatar: './img/bot2.jpg',
-              bot: true,
-            });
-            break;
-          }
-          if (this.questionsLeft === 0) {
-            this.messages.push({
-              text: 'Sorry, maximum number of question exceeded!):',
-              sentAt: Date.now(),
-              avatar: './img/bot2.jpg',
-              bot: true,
-            });
-            break;
-          }
-          if (this.hasUnansweredQuestion) {
-            this.messages.push({
-              text: 'Sorry, you can only ask one question at a time... ):',
-              sentAt: Date.now(),
-              avatar: './img/bot2.jpg',
-              bot: true,
-            });
-            break;
-          }
-          this.send({
-            sender: this.loggedInPlayer._id,
-            chat: this.currentChatId,
-            text: `@question: ${getTextFromCmd(text)}`,
-            sentAt: Date.now(),
-            meta: {
-              question: true,
-              gameId,
-            },
-          });
-          break;
-        case '/answer':
-          if (!this.game) {
-            this.messages.push({
-              text: 'No active game right now... Start a new game by typing \'/game word\'',
-              sentAt: Date.now(),
-              chat: this.currentChatId,
-              meta: { bot: true },
-            });
-            break;
-          }
-          if (!this.isPlayer1) {
-            this.messages.push({
-              text: 'You cannot answer a question on a game you did not start... ):',
-              sentAt: Date.now(),
-              avatar: './img/bot2.jpg',
-              bot: true,
-            });
-            break;
-          }
-          if (!this.hasUnansweredQuestion) {
-            this.messages.push({
-              text: 'No pending question for you to answer',
-              sentAt: Date.now(),
-              avatar: './img/bot2.jpg',
-              bot: true,
-            });
-            break;
-          }
-          this.send({
-            sender: this.loggedInPlayer._id,
-            chat: this.currentChatId,
-            text: `@answer: ${getTextFromCmd(text)}`,
-            sentAt: Date.now(),
-            meta: {
-              answer: true,
-              gameId,
-              questionId: this.game.questions[this.game.questions.length - 1].question,
-            },
-          });
-          break;
-        case '/help':
-          this.messages.push({
-            text: '/game to start a new game\n, /guess to guess the word during a game, /help for this help',
-            sentAt: Date.now(),
-            avatar: './img/bot2.jpg',
-            bot: true,
-          });
-          break;
-        default:
-          this.send({
-            sender: this.loggedInPlayer._id,
-            chat: this.currentChatId,
-            text: text.toString(),
-            sentAt: Date.now(),
-          });
-      }
-      this.text = '';
+      messageHandler.call(this);
     },
     send(msg) {
       this.socket.emit('new-message', msg);
@@ -330,7 +372,6 @@ export default {
     },
   },
 };
-
 </script>
 
 <style scoped>
@@ -340,8 +381,8 @@ export default {
     background-color: rgba(0,0,0,0.4) !important;
   }
   .msg_card_body{
-    /*overflow-y: auto;*/
-    overflow-y: scroll;
+    overflow-y: auto;
+    /*overflow-y: scroll;*/
   }
   .card-header{
     border-radius: 15px 15px 0 0 !important;

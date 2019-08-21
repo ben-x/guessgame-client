@@ -1,6 +1,7 @@
 {
   "name": "web",
   "version": "0.1.0",
+  "description": "A 20 Word game for guessing",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -19,6 +20,7 @@
     "popper.js": "^1.15.0",
     "socket.io": "^2.2.0",
     "vue": "^2.6.10",
+    "vue-js-modal": "^1.3.31",
     "vue-router": "^3.0.3",
     "vue-toasted": "^1.1.27",
     "vuex": "^3.0.1",

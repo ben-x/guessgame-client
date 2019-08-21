@@ -1,0 +1,29 @@
+FROM node:10
+
+RUN apt-get update
+RUN apt-get install -y git
+RUN npm install -g nodemon
+
+WORKDIR .
+
+RUN git clone https://github.com/ben-x/guessgame-server.git guessgame0
+
+WORKDIR guessgame0
+
+ENV NODE_ENV test
+ENV TZ Africa/Lagos
+ENV PORT 3001
+ENV APP_NAME "GuessGame: a 20 word guess game"
+ENV APP_CODE GG
+ENV SESSION_SECRET mysessionsecret
+ENV ENABLE_HTTPS false
+ENV DOMAIN ""
+ENV ORIGIN "http://localhost:8080"
+ENV SESSION_DURATION 86400000
+ENV MONGODB_URI mongodb://mongo:27017/guess
+
+RUN npm install
+RUN npm run build
+
+# Launch server application
+CMD ["nodemon","dest/index.js"]

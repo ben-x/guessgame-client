@@ -8,6 +8,8 @@ module.exports = {
     '@vue/airbnb',
   ],
   rules: {
+    'no-param-reassign': 'off',
+    'no-underscore-dangle': 'off',
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
   },
@@ -15,7 +17,7 @@ module.exports = {
     parser: 'babel-eslint',
   },
   globals: {
-    "$": true,
-    "jQuery": true,
+    $: true,
+    jQuery: true,
   },
 };

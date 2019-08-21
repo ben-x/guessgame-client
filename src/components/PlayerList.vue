@@ -30,7 +30,7 @@
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex';
 import ActionTypes from '../store/action-types';
-import {Mutations} from '../store/mutations';
+import { Mutations } from '../store/mutations';
 import Contact from './Contact.vue';
 
 export default {

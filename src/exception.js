@@ -10,9 +10,11 @@ class Exception extends Error {
     this.name = Exception.name;
     this.code = code;
   }
+
   setCode(code) {
     this.code = code;
   }
+
   setMessage(message) {
     this.message = message;
   }
@@ -27,7 +29,7 @@ class NetworkException extends Exception {
 }
 
 class InternetConnectionException extends NetworkException {
-  constructor(message, code) {
+  constructor(message) {
     super(message);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = InternetConnectionException.name;
@@ -61,7 +63,7 @@ class ServerException extends Exception {
   }
 }
 
-class BadRequestException extends Exception  {
+class BadRequestException extends Exception {
   constructor(message, fields) {
     super(message);
     Object.setPrototypeOf(this, new.target.prototype);

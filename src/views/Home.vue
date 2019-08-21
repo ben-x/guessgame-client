@@ -25,7 +25,9 @@
         </div>
         <div class="form-group">
           <router-link to="/register">Setup New Player</router-link>
-<!--          <span class="text-danger d-block" v-if="errorMsg">{{errorMsg}} - [{{errorCode}}]</span>-->
+          <!--
+          <span class="text-danger d-block" v-if="errorMsg">{{errorMsg}} - [{{errorCode}}]</span>
+          -->
         </div>
       </form>
     </div>
@@ -49,7 +51,7 @@ export default {
     ]),
     submit(evt) {
       evt.preventDefault();
-      this.login(this.username).then(() => {
+      this.login(this.username.trim().toLowerCase()).then(() => {
         this.$router.push('players');
       }).catch((error) => {
         this.$toasted.error(error.message, { duration: 2000 });

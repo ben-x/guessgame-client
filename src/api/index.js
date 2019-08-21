@@ -1,7 +1,15 @@
 import { startGame, guessWord, getGames } from './game';
-import { login, signUp, startChat, getPlayer, getAllPlayer, logout } from './player';
 import { getMessages, getChats } from './chat';
-import { getSocket } from './socket';
+import getSocket from './socket';
+import {
+  login,
+  signUp,
+  startChat,
+  getPlayer,
+  getAllPlayer,
+  logout,
+  registerPlayer,
+} from './player';
 
 export {
   login,
@@ -16,4 +24,5 @@ export {
   getSocket,
   getGames,
   logout,
+  registerPlayer,
 };

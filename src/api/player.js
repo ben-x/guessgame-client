@@ -12,50 +12,42 @@ axios.defaults.withCredentials = true;
  * @param username
  * @return {Promise<AxiosResponse<Player> | never>}
  */
-export const login = (username) => {
-  return axios({
-    url: `${process.env.VUE_APP_API}/player/signin`,
-    method: 'post',
-    data: {
-      username,
-    },
-    withCredentials: true,
-  }).then((response) => {
-    return response.data.payload;
-  }).catch((error) => {
-    if (error.message === 'Network Error') {
-      throw new NetworkException('There seem to be a network issue at the moment');
-    }
-    const res = error.response;
-    if (error.status === 400) {
-      throw new BadRequestException(res.data.responseText);
-    }
-    throw new AuthenticationException(res.data.responseText, res.data.responseCode);
-  });
-};
+export const login = username => axios({
+  url: `${process.env.VUE_APP_API}/player/signin`,
+  method: 'post',
+  data: {
+    username,
+  },
+  withCredentials: true,
+}).then(response => response.data.payload).catch((error) => {
+  if (error.message === 'Network Error') {
+    throw new NetworkException('There seem to be a network issue at the moment');
+  }
+  const res = error.response;
+  if (error.response.status === 400) {
+    throw new BadRequestException(res.data.responseText);
+  }
+  throw new AuthenticationException(res.data.responseText, res.data.responseCode);
+});
 
 /**
  * @desc Logs out a user
  * @return {Promise<AxiosResponse<any> | never>}
  */
-export const logout = () => {
-  return axios({
-    url: `${process.env.VUE_APP_API}/player/logout`,
-    method: 'post',
-    withCredentials: true,
-  }).then(() => {
-    return true;
-  }).catch((error) => {
-    if (error.message === 'Network Error') {
-      throw new NetworkException('There seem to be a network issue at the moment');
-    }
-    const res = error.response;
-    if (error.status === 400) {
-      throw new BadRequestException(res.data.responseText);
-    }
-    throw new AuthenticationException(res.data.responseText, res.data.responseCode);
-  });
-};
+export const logout = () => axios({
+  url: `${process.env.VUE_APP_API}/player/logout`,
+  method: 'post',
+  withCredentials: true,
+}).then(() => true).catch((error) => {
+  if (error.message === 'Network Error') {
+    throw new NetworkException('There seem to be a network issue at the moment');
+  }
+  const res = error.response;
+  if (error.response.status === 400) {
+    throw new BadRequestException(res.data.responseText);
+  }
+  throw new AuthenticationException(res.data.responseText, res.data.responseCode);
+});
 
 /**
  * @param username
@@ -63,30 +55,26 @@ export const logout = () => {
  * @param avatar
  * @return {Promise<AxiosResponse<Player> | never>}
  */
-export const signUp = ({ username, bio, avatar }) => {
-  return axios({
-    url: `${process.env.VUE_APP_API}/player/register`,
-    method: 'post',
-    data: {
-      username,
-      bio,
-      avatar,
-    },
-  }).then((response) => {
-    return response.data.payload;
-  }).catch((error) => {
-    if (error.message === 'Network Error') {
-      throw new NetworkException('There seem to be a network issue at the moment');
-    }
-    const res = error.response;
-    if (error.status === 400) {
-      throw new BadRequestException(res.data.responseText);
-    }
-    if (error.status === 500) {
-      throw new ServerException('Server is currently unable to process this request');
-    }
-  });
-};
+export const signUp = ({ username, bio, avatar }) => axios({
+  url: `${process.env.VUE_APP_API}/player/register`,
+  method: 'post',
+  data: {
+    username,
+    bio,
+    avatar,
+  },
+}).then(response => response.data.payload).catch((error) => {
+  if (error.message === 'Network Error') {
+    throw new NetworkException('There seem to be a network issue at the moment');
+  }
+  const res = error.response;
+  if (error.response.status === 400) {
+    throw new BadRequestException(res.data.responseText);
+  }
+  if (error.response.status === 500) {
+    throw new ServerException('Server is currently unable to process this request');
+  }
+});
 
 /**
  * @desc get the details of the current player
@@ -100,14 +88,12 @@ export const getPlayer = ({ includeChats }) => {
   }
   return axios.get(`${process.env.VUE_APP_API}/player/get`, {
     params,
-  }).then((response) => {
-    return response.data.payload;
-  }).catch((error) => {
+  }).then(response => response.data.payload).catch((error) => {
     if (error.message === 'Network Error') {
       throw new NetworkException('There seem to be a network issue at the moment');
     }
     const res = error.response;
-    if (error.status === 400) {
+    if (error.response.status === 400) {
       throw new BadRequestException(res.data.responseText);
     }
     throw new Exception('An unknown error has occurred');
@@ -135,7 +121,7 @@ export const getAllPlayer = ({ page, limit, includeChats }) => {
       throw new NetworkException('There seem to be a network issue at the moment');
     }
     const res = error.response;
-    if (error.status === 400) {
+    if (error.response.status === 400) {
       throw new BadRequestException(res.data.responseText);
     }
     throw new Exception('An unknown error has occurred');
@@ -146,22 +132,43 @@ export const getAllPlayer = ({ page, limit, includeChats }) => {
  * @param playerId
  * @return {Promise<AxiosResponse<Chat> | never>}
  */
-export const startChat = (playerId) => {
-  return axios({
-    url: `${process.env.VUE_APP_API}/player/start-chat`,
-    method: 'post',
-    data: {
-      playerId,
-    },
-  }).then((response) => {
-    return response.data.payload;
-  }).catch((error) => {
-    if (error.message === 'Network Error') {
-      throw new NetworkException('There seem to be a network issue at the moment');
-    }
-    const res = error.response;
-    if (error.status === 400) {
-      throw new BadRequestException(res.data.responseText);
-    }
-  });
-};
+export const startChat = playerId => axios({
+  url: `${process.env.VUE_APP_API}/player/start-chat`,
+  method: 'post',
+  data: {
+    playerId,
+  },
+}).then(response => response.data.payload).catch((error) => {
+  if (error.message === 'Network Error') {
+    throw new NetworkException('There seem to be a network issue at the moment');
+  }
+  const res = error.response;
+  if (error.response.status === 400) {
+    throw new BadRequestException(res.data.responseText);
+  }
+});
+
+/**
+ * @desc creates a new player
+ * @param {String} username
+ * @param {String} bio
+ * @param {String} avatar
+ * @return {Promise<AxiosResponse<Chat> | never>}
+ */
+export const registerPlayer = ({ username, bio, avatar }) => axios({
+  url: `${process.env.VUE_APP_API}/player/register`,
+  method: 'post',
+  data: {
+    username,
+    bio,
+    avatar,
+  },
+}).then(response => response.data.payload).catch((error) => {
+  if (error.message === 'Network Error') {
+    throw new NetworkException('There seem to be a network issue at the moment');
+  }
+  const res = error.response;
+  if (error.response.status === 400) {
+    throw new BadRequestException(res.data.responseText);
+  }
+});

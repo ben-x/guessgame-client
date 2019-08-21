@@ -41,7 +41,8 @@
 </template>
 
 <script>
-import axios from 'axios';
+import { mapActions } from 'vuex';
+import ActionTypes from '../store/action-types';
 
 export default {
   name: 'Register',
@@ -55,23 +56,21 @@ export default {
     };
   },
   methods: {
+    ...mapActions([
+      ActionTypes.registerPlayer,
+    ]),
     join(evt) {
       evt.preventDefault();
-      axios({
-        url: `${process.env.VUE_APP_API}/player/register`,
-        method: 'post',
-        data: {
-          username: this.username,
-          bio: this.bio,
-          avatar: `avatar-${Math.floor((Math.random() * 5) + 1)}`,
-        },
-      }).then((response) => {
+      this.registerPlayer({
+        username: this.username.trim().toLowerCase(),
+        bio: this.bio.trim(),
+        avatar: `avatar-${Math.floor((Math.random() * 5) + 1)}.png`,
+      }).then(() => {
         this.$toasted.success('Registration Successful', { duration: 1000 });
         setTimeout(() => { this.$router.push('/'); }, 1100);
       }).catch((error) => {
-        const res = error.response;
-        this.errorMsg = res.data.responseText;
-        this.errorCode = res.data.responseCode;
+        this.errorMsg = error.message;
+        this.errorCode = error.code;
       });
     },
   },

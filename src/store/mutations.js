@@ -1,5 +1,3 @@
-import Vue from 'vue';
-
 export const Mutations = {
   updateAllPlayers: 'updateAllPlayers',
   addPlayer: 'addPlayer',
@@ -15,10 +13,13 @@ export const Mutations = {
   updateAllGames: 'updateAllGames',
   updateGame: 'updateGame',
   resetState: 'resetState',
+  setLoginStatus: 'setLoginStatus',
 };
 
 export default {
-  updateAllPlayers(state, { players, total, page, limit }) {
+  updateAllPlayers(state, {
+    players, total, page, limit,
+  }) {
     state.players.items = players;
     state.players.total = total;
     state.players.page = page;
@@ -52,13 +53,12 @@ export default {
     state.socket = socket;
   },
   updateAllMessages(state, messages) {
-    state.messages = messages;
+    state.messages = [].concat(messages);
   },
   addGame(state, game) {
     state.games.push(game);
   },
   updateGame(state, game) {
-    // Vue.set(state.games, game._id, game);
     const idx = state.games.findIndex(i => i._id === game._id);
     const games = [].concat(state.games);
     games[idx] = game;
@@ -68,7 +68,10 @@ export default {
     state.games = games;
   },
   resetState(state) {
+    state.isLoggedIn = false;
     state = {};
-    localStorage.clear();
+  },
+  setLoginStatus(state, status) {
+    state.isLoggedIn = status;
   },
 };

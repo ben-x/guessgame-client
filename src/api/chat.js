@@ -18,14 +18,12 @@ export const getMessages = (chatId = null) => {
   }
   return axios.get(`${process.env.VUE_APP_API}/chat/messages`, {
     params,
-  }).then((response) => {
-    return response.data.payload;
-  }).catch((error) => {
+  }).then(response => response.data.payload).catch((error) => {
     if (error.message === 'Network Error') {
       throw new NetworkException('There seem to be a network issue at the moment');
     }
     const res = error.response;
-    if (error.status === 400) {
+    if (error.response.status === 400) {
       throw new BadRequestException(res.data.responseText);
     }
     throw new Exception('An unknown error has occurred');
@@ -40,14 +38,12 @@ export const getChats = () => {
   const params = {};
   return axios.get(`${process.env.VUE_APP_API}/chat/get`, {
     params,
-  }).then((response) => {
-    return response.data.payload;
-  }).catch((error) => {
+  }).then(response => response.data.payload).catch((error) => {
     if (error.message === 'Network Error') {
       throw new NetworkException('There seem to be a network issue at the moment');
     }
     const res = error.response;
-    if (error.status === 400) {
+    if (error.response.status === 400) {
       throw new BadRequestException(res.data.responseText);
     }
     throw new Exception('An unknown error has occurred');

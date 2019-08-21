@@ -36,7 +36,7 @@
             </router-link>
           </li>
           <li class="nav-item">
-            <a href="#"
+            <a href=""
               class="nav-link"
               v-if="isUserLoggedIn" @click="signOut()">
                 <i class="icon"></i>Logout
@@ -46,14 +46,30 @@
       </div>
     </nav>
     <router-view/>
+    <div class="modal"
+         id="spinner-modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="modalLabel"
+         aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="mx-auto" style="margin-top: 50%">
+          <Spinner :size="150" ref="spinner"></Spinner>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import ActionTypes from './store/action-types';
+import Spinner from '@/components/Spinner.vue';
 
 export default {
+  components: {
+    Spinner,
+  },
   computed: {
     ...mapGetters({
       isUserLoggedIn: 'isUserLoggedIn',

@@ -37,7 +37,7 @@ export default {
       this.socket = socket;
     });
     this.getAllMessages();
-    this.getAllGames({ page: 1, limit: 50, });
+    this.getAllGames({ page: 1, limit: 50 });
   },
 };
 </script>

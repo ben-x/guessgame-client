@@ -30,5 +30,11 @@ yarn run lint
 yarn run test:e2e
 ```
 
+### Deployment
+Please make sure docker and docker-compose are installed on your machine
+```
+- set enviroment variables in Dockerfile and Dockerfile-server
+- docker-compose up --build
+```
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).

@@ -14,7 +14,7 @@
 </template>
 
 <script>
-  export default {
-    props: ["name", "avatar"]
-  };
+export default {
+  props: ['name', 'avatar'],
+};
 </script>

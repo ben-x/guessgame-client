@@ -1,12 +1,6 @@
-import Cookie from 'js-cookie';
-
-export const getChats = (state) => {
-  return state.chats;
-};
-
-export const currentChat = (state) => {
-  return state.currentChatId ? state.chats.find(i => i._id === state.currentChatId) : {};
-};
+export const currentChat = state => (state.currentChatId
+  ? state.chats.find(i => i._id === state.currentChatId)
+  : {});
 
 export const currentMessages = (state) => {
   return state.messages
@@ -37,7 +31,7 @@ export const getCurrentChat = (state) => {
 
 export const currentActiveGame = (state) => {
   const { games, currentChatId } = state;
-  return games.find((game) => { return game && game.chat === currentChatId && game.status === 'active'; });
+  return games.find(game => game && game.chat === currentChatId && game.status === 'active');
 };
 
-export const isUserLoggedIn = (state) => typeof Cookie.get('ASID') === 'string';
+export const isUserLoggedIn = state => state.isLoggedIn;

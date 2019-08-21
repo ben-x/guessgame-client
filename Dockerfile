@@ -1,7 +1,11 @@
 FROM node:10
+
 COPY ./ /web
 WORKDIR /web
-RUN npm install && npm run build
+ENV VUE_APP_API http://localhost:3001
+ENV VUE_APP_BOT_NAME GuessBot
+RUN yarn install
+RUN yarn build
 
 FROM nginx
 RUN mkdir /web

@@ -3,13 +3,9 @@
     <h2>Players({{players.total}})</h2>
     <div class="row">
       <div class="col col-xs-12 col-sm-12 col-md-3 pl-2 pt-2"
-           v-for="(user, index) in players.items" v-bind:key="index">
+           v-for="(player, index) in players.items" v-bind:key="index">
         <Player
-          :id="user._id"
-          :name="user.username"
-          :desc="user.bio"
-          :status="user.status"
-          :avatar="user.avatar">
+          :player="player">
         </Player>
       </div>
     </div>

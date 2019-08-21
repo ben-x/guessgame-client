@@ -2,7 +2,6 @@ const Types = {
   getAllPlayers: 'getAllPlayers',
   getAllMessages: 'getAllMessages',
   switchChat: 'switchChat',
-  sendMessage: 'sendMessage',
   login: 'login',
   startChat: 'startChat',
   getAllChats: 'getAllChats',
@@ -11,6 +10,7 @@ const Types = {
   guessWord: 'guessWord',
   getAllGames: 'getAllGames',
   logout: 'logout',
+  registerPlayer: 'registerPlayer',
 };
 
 export default Types;
