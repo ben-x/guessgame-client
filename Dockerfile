@@ -3,7 +3,7 @@ FROM node:10
 COPY ./ /web
 WORKDIR /web
 ENV VUE_APP_API http://localhost:3001
-ENV VUE_APP_BOT_NAME GuessBot
+ENV VUE_APP_BOT_NAME Bot
 RUN yarn install
 RUN yarn build
 

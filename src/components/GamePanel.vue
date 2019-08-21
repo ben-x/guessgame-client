@@ -345,11 +345,14 @@ export default {
       ActionTypes.guessWord,
     ]),
     hasPendingQuestion() {
-      if (this.game) {
-        // if there are questions in the game and every question has an answer
-        return !(this.game.questions.length > 0 && this.game.questions.every(i => i.answer));
+      if (!this.game) {
+        return false;
       }
-      return null;
+      if (this.game.questions.length <= 0) {
+        return false;
+      }
+      // if there are questions in the game and every question has an answer
+      return !this.game.questions.every(i => typeof i.answer === 'string');
     },
     handleMessage() {
       messageHandler.call(this);
