@@ -2,14 +2,12 @@ export const currentChat = state => (state.currentChatId
   ? state.chats.find(i => i._id === state.currentChatId)
   : {});
 
-export const currentMessages = (state) => {
-  return state.messages
-    ? state.messages.filter(msg => msg.chat === state.currentChatId).map((msg) => {
-      msg.mine = msg.sender === state.loggedInPlayer._id;
-      return msg;
-    })
-    : [];
-};
+export const currentMessages = state => (state.messages
+  ? state.messages.filter(msg => msg.chat === state.currentChatId).map((msg) => {
+    msg.mine = msg.sender === state.loggedInPlayer._id;
+    return msg;
+  })
+  : []);
 
 export const sortedMessages = (state, getters) => {
   const messages = getters.currentMessages;
