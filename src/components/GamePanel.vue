@@ -202,7 +202,7 @@ function messageHandler() {
         });
         break;
       }
-      if (this.hasUnansweredQuestion) {
+      if (this.hasPendingQuestion()) {
         this.messages.push({
           text: 'Sorry, you can only ask one question at a time... ):',
           sentAt: Date.now(),
@@ -241,7 +241,7 @@ function messageHandler() {
         });
         break;
       }
-      if (!this.hasUnansweredQuestion) {
+      if (!this.hasPendingQuestion()) {
         this.messages.push({
           text: 'No pending question for you to answer',
           sentAt: Date.now(),
@@ -329,12 +329,6 @@ export default {
       }
       return null;
     },
-    hasUnansweredQuestion() {
-      if (this.game) {
-        return this.game.questions.length > 0 && this.game.questions.every(i => typeof i.answer !== 'string');
-      }
-      return null;
-    },
     lastMessage() {
       return this.messages[this.messages.length - 1];
     },
@@ -350,6 +344,13 @@ export default {
       ActionTypes.startGame,
       ActionTypes.guessWord,
     ]),
+    hasPendingQuestion() {
+      if (this.game) {
+        // if there are questions in the game and every question has an answer
+        return !(this.game.questions.length > 0 && this.game.questions.every(i => i.answer));
+      }
+      return null;
+    },
     handleMessage() {
       messageHandler.call(this);
     },
