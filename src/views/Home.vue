@@ -23,8 +23,8 @@
             @click="submit"
             :disabled="username.length < 3">Submit</button>
         </div>
-        <div class="form-group">
-          <router-link to="/register">Setup New Player</router-link>
+        <div class="form-group mt-5">
+          <router-link to="/register">Resgister New Player</router-link>
           <!--
           <span class="text-danger d-block" v-if="errorMsg">{{errorMsg}} - [{{errorCode}}]</span>
           -->
